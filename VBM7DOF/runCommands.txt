@@ -1,0 +1,5 @@
+aspelun1@Lenovo:~/Documents/7DOF (copy)$ g++ -std=c++11 -pthread FEMControl_7DOF_06.cpp -ldl -o FEMControl_7DOF6
+aspelun1@Lenovo:~/Documents/7DOF (copy)$ ./FEMControl_7DOF6 swa
+
+aspelun1@Lenovo:~/Documents/7DOF (copy)$ ./killProcessByName FEMControl_7DOF6
+aspelun1@Lenovo:~/Documents/7DOF (copy)$ ./stop_streaming

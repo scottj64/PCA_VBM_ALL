@@ -1,0 +1,60 @@
+IMU locations:
+IMU1 - right shoulder crease with light near top
+IMU2 - left shoulder crease with light near top
+IMU3 - center of chest with light near top
+IMU4 - top of header with light towards front
+sdlab - back of head with light near top
+
+
+
+PCA INSTRUCTIONS
+
+Press <Ctrl-Alt-T> to open up a new terminal window
+Type "cd Documents/IncrementalLearning" (no quotes) and press <Enter>
+	alternately type "cd Doc<Tab>In<Tab>" for autocomplete to do the typing for you
+Type "matlab &" and press <Enter>
+
+Now open up the file browser on the left called "Files" (second icon) and navigate to Documents->IncrementalLearning->Data where you shall create a folder called "xyz" (no quotes) where "xyz" are the participant's initials
+	Alternatively, in the terminal window, type 
+		"mkdir Data/xyz" where "xyz" are the participant's intitials
+
+Once Matlab has opened type "parpool" and move on (this is a step that will save time later so it is okay if skipped)
+
+To run the calibration and generate the PCA vectors, in the terminal windows, type
+	"./generateCalibrationMatrix xyz" where "xyz" are the participant's initials
+This is the part where the participant will have to do the range of motion dance
+	
+Back in Matlab make sure you are in home->aspelun1->Documents->IncrementalLearning and type "makeVideos" then enter "xyz" as prompted where "xyz" are the participant's initials. This will generate the videos for the users PCA motions that can be used. These are located in the folder that you previously made called "xyz" in Documents->IncrementalLearning->Data
+
+
+To run the VBM portion of the experiment type
+	"./VBM_7DOF xyz #" where "xyz" are the participant's initials and # is the number of degrees of freedom being used.
+	
+To run the PCA portion of the experiment type
+	"./PCA_7DOF xyz #" where "xyz" are the participant's initials and # is the number of degrees of freedom being used.
+
+VBM INSTRUCTIONS
+Press <Ctrl-Alt-T> to open up a new terminal window
+Type "cd Documents/IncrementalLearning" (no quotes) and press <Enter>
+	alternately type "cd Doc<Tab>In<Tab>" for autocomplete to do the typing for you
+
+Now open up the file browser on the left called "Files" (second icon) and navigate to Documents->IncrementalLearning->Data where you shall create a folder called "xyz" (no quotes) where "xyz" are the participant's initials
+	Alternatively, in the terminal window, type 
+		"mkdir Data/xyz" where "xyz" are the participant's intitials
+
+To run the VBM portion of the experiment type
+	"./VBM_7DOF xyz #" where "xyz" are the participant's initials and # is the number of degrees of freedom being used.
+
+	
+To-do:
+Get rid of parameter files and just make those the default constants
+check out subplots for animations
+DOF 4 is grasp
+567->yaw,pitch,roll
+
+multiple sessions per degree of freedom
+move on based on being fast enough at DOF. Determine criteria
+also cutoff criterion
+
+locate fingers and lights for goals
+mug on post idea for ensuring rotational DOF

@@ -1,0 +1,148 @@
+#Parameter file for Attempt program
+#anything on a line after a pound symbol will be ignored
+#the format is "key=value" with no spaces
+#These values will be used to change those in globalVariablesAndConstantsFEM1.h
+
+#LOOP_FREQUENCY
+#Frequency at which the main loop (read from IMUs and send velocities to robot)
+# runs as well as the sampling rate of the IMUs  
+#Type = integer
+#Default = 100
+
+#LOOP_FREQUENCY=100
+
+
+#IMU_FREQUENCY
+#Frequency at which the IMUs spit out values 
+#Type = integer
+#Default = 100
+
+IMU_FREQUENCY=40
+
+
+#MATLAB_FREQUENCY   ### CURRENTLY NOT IMPLEMENTED
+#Frequency at which MATLAB spits out values 
+#Type = integer
+#Default = 100
+
+MATLAB_FREQUENCY=25
+
+
+#F1Gain
+#Value that F1 is multiplied by after calculation
+#Type = float
+#Default = 2.5e-6
+
+F1Gain=5e-6
+
+
+#F1Thresh
+#Minimum absolute value that F1 must exceed to be considered
+#Type = float
+#Default = 2.5e4
+
+F1Thresh=2.5e3
+
+
+#F2Gain
+#Value that F2 is multiplied by after calculation
+#Type = float
+#Default = 1.4e-5
+
+F2Gain=1.4e-6
+
+
+#F2Thresh
+#Minimum absolute value that F2 must exceed to be considered
+#Type = float
+#Default = 3e3
+
+#F2Thresh=3e3
+
+
+#F3Gain
+#Value that F3 is multiplied by after calculation
+#Type = float
+#Default = 7e-6
+
+#F3Gain=7e-6
+
+
+#F3Thresh
+#Minimum absolute value that F3 must exceed to be considered
+#Type = float
+#Default = 0.75e4
+
+#F3Thresh=0.75e4
+
+
+#F4Gain
+#Value that F4 is multiplied by after calculation
+#Type = float
+#Default = 20e-5
+
+F4Gain=10e-5
+
+
+#F4Thresh
+#Minimum absolute value that F4 must exceed to be considered
+#Type = float
+#Default = 1e3
+
+#F4Thresh=1e3
+
+
+#F5Gain
+#Value that F5 is multiplied by after calculation
+#Type = float
+#Default = 20e-5
+
+F5Gain=10e-5
+
+
+#F5Thresh
+#Minimum absolute value that F5 must exceed to be considered
+#Type = float
+#Default = 1e3
+
+#F5Thresh=1e3
+
+
+#F6Gain
+#Value that F6 is multiplied by after calculation
+#Type = float
+#Default = 20e-5
+
+F6Gain=5e-5
+
+
+#F6Thresh
+#Minimum absolute value that F6 must exceed to be considered
+#Type = float
+#Default = 1e3
+
+F6Thresh=2.5e3
+
+
+#F7Gain
+#Value that F7 is multiplied by after calculation
+#Type = float
+#Default = 4e-6
+
+F7Gain=6e-6
+
+
+#F7ThreshClose
+#Minimum positive value that F7 must exceed to be considered
+#Type = float
+#Default = 3e4
+
+F7ThreshClose=1e4
+
+
+#F7ThreshOpen
+#Minimum negative value that F7 must exceed to be considered
+#Type = float
+#Default = 2.65e4
+
+F7ThreshOpen=2.5e4

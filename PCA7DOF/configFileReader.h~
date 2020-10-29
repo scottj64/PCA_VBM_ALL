@@ -1,0 +1,150 @@
+#ifndef ConfigReaderFile
+#define ConfigReaderFile
+
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <map>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>		// atof
+#include <climits>
+
+//g++ -std=c++11 ConfigFileReader.cpp -o ConfigFileReader
+#include "globalVariablesAndConstants3.h"
+
+
+bool store_line( std::string key, std::string value)
+{
+//	printf("store_line\n");
+	if (key == "IMUoffsetValue")
+	{
+		printf("IMUoffsetValue:\t\tfrom\t%d\tto\t",IMUoffsetValue);
+		IMUoffsetValue = stoi(value);
+		printf("%d\n",IMUoffsetValue);
+		return true;
+	}
+	else if (key == "velocityScaleFactor")
+	{
+		printf("velocityScaleFactor:\tfrom\t%g\tto\t",velocityScaleFactor);
+		velocityScaleFactor = stof(value);
+		printf("%g\n",velocityScaleFactor);
+		return true;
+	}
+	else if (key == "bufferSize")
+	{
+		printf("bufferSize:\t\tfrom\t%g\tto\t",bufferSize);
+		bufferSize = stof(value);
+		printf("%g\n",bufferSize);
+		return true;
+	}
+	else if (key == "boundaryVelocityBias")
+	{
+		printf("boundaryVelocityBias:\tfrom\t%g\tto\t",boundaryVelocityBias);
+		boundaryVelocityBias = stof(value);
+		printf("%g\n",boundaryVelocityBias);
+		return true;
+	}
+	else if (key == "LOOP_FREQUENCY")
+	{
+		printf("LOOP_FREQUENCY:\t\tfrom\t%d\tto\t",LOOP_FREQUENCY);
+		LOOP_FREQUENCY = stoi(value);
+		printf("%d\n",LOOP_FREQUENCY);
+		return true;
+	}
+	else if (key == "GRAPHING_FREQUENCY")
+	{
+		printf("GRAPHING_FREQUENCY:\tfrom\t%d\tto\t",GRAPHING_FREQUENCY);
+		GRAPHING_FREQUENCY = stoi(value);
+		printf("%d\n",GRAPHING_FREQUENCY);
+		return true;
+	}
+	else if (key == "newGoalColorCutoffTime")
+	{
+		printf("newGoalColorCutoffTime:\tfrom\t%g\tto\t",newGoalColorCutoffTime);
+		newGoalColorCutoffTime = stof(value);
+		printf("%g\n",newGoalColorCutoffTime);
+		return true;
+	}
+	else if (key == "goalSizeMult")
+	{
+		printf("goalSizeMult:\t\tfrom\t%g\tto\t",goalSizeMult);
+		goalSizeMult = stof(value);
+		printf("%g\n",goalSizeMult);
+		return true;
+	}
+	else if (key == "timeRequiredToBeInGoal")
+	{
+		printf("timeRequiredToBeInGoal:\tfrom\t%g\tto\t",timeRequiredToBeInGoal);
+		timeRequiredToBeInGoal = stof(value);
+		printf("%g\n",timeRequiredToBeInGoal);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
+}
+
+
+//int main(int argc, char ** argv)
+bool configFileReader( const char * configFileName)
+{
+	//std::ifstream file("ConfigFileFullMain.txt");
+	std::ifstream file(configFileName);
+	
+	std::stringstream is_file;
+	
+	is_file << file.rdbuf();
+	file.close();
+	
+	
+	std::string line;
+
+//	printf("\n");
+	
+	while( std::getline(is_file, line) )
+	{
+//		printf("while %s\n", line.c_str());
+		std::istringstream is_line(line);
+		std::string is_line2;
+		std::string key;
+//		if( 
+		std::getline(is_line, is_line2, '#') ;//)
+//		printf("is_line = '%s'\n", is_line2.c_str());
+//		printf("is_line2.length() = %ld\n", is_line2.length());
+		
+		if( is_line2.length() == 0 )
+		{
+			is_line.ignore( INT_MAX, '\n');
+		}
+		else 
+		{
+			std::istringstream is_line3(is_line2);
+			if( std::getline(is_line3, key, '=') )
+			{
+	//			printf("if1 %s\n", key.c_str());
+				std::string value;
+				if( std::getline(is_line3, value) ) 
+				{
+	//				printf("if2%s\n", value.c_str());
+					if(!store_line(key, value))
+					{
+						printf("Failed to change key=%s to value=%s\t\tExiting Program\n",key.c_str(),value.c_str());
+						return 1;
+					}
+				}
+			}
+		}
+		
+	}
+	
+//	printf("goalSizeMult:\t%f\n",goalSizeMult);
+//	printf("IMUOffset:\t%d\n",IMUOffset);
+	
+	
+	return 0;
+}
+
+#endif //ConfigReaderFile

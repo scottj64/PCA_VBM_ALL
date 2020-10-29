@@ -1,0 +1,102 @@
+#ifndef PROJECTION3
+#define PROJECTION3
+
+#include <map>
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include "gnuplot-iostream.h"
+#include <stdlib.h>
+#include <time.h>
+#include <string>
+#include <stdio.h>
+#include <fstream>
+#include <chrono>
+
+#include "DataStorage.h"
+
+//these values get to be played with as the graphs resizes according to its limits
+#define X_GRAPH_MIN 0.05
+#define X_GRAPH_MAX 0.78
+#define Y_GRAPH_MIN 0.24
+#define Y_GRAPH_MAX 0.78
+
+#define X_ROBOT_MIN 0.08
+#define X_ROBOT_MAX 0.60
+#define Y_ROBOT_MIN 0.20
+#define Y_ROBOT_MAX 0.62
+
+#define VERT_SHIFT 0.04
+
+
+float goalArrayX[] = {.15, .4, .4, .65};
+float goalArrayY[] = {.5, .35, .65,.5 };
+float centerX = .4;
+float centerY = .5;
+
+
+void graph ( Gnuplot &gp, dataPoint currDP)
+{
+	std::vector<std::pair<double, double> > goalPoint;
+	goalPoint.push_back(std::make_pair(currDP.goalX, currDP.goalY+VERT_SHIFT));
+	
+	std::vector<std::pair<double, double> > currentPoint;
+	currentPoint.push_back(std::make_pair(currDP.currentX, currDP.currentY+VERT_SHIFT));
+	
+	std::vector<boost::tuple<double, double, double, double> > directionVector;
+	directionVector.push_back(boost::make_tuple(currDP.currentX, currDP.currentY+VERT_SHIFT, currDP.velocityX/2.0, (currDP.velocityY+VERT_SHIFT)/2.0));
+	
+	gp << "set xrange [" << X_GRAPH_MIN << ":" << X_GRAPH_MAX << "]\nset yrange [" << Y_GRAPH_MIN << ":" << Y_GRAPH_MAX << "]\n";
+	gp << "set size ratio -1" << std::endl;
+	// Data will be sent via a temporary file.  These are erased when you call
+	// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
+	// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
+	// and won't be deleted (this is useful when creating a script).
+	
+	gp << "plot" << gp.file1d(goalPoint) << " with points pointtype 7 pointsize 17 notitle," << gp.file1d(currentPoint) 
+	<< " with points" << " pointtype 7 pointsize 7 notitle, '-' with vectors ls 4 lw 5 notitle" << std::endl;
+	
+	gp.send1d(directionVector);
+	
+	return;
+}
+
+void goalCheck(dataPoint *currDP)
+{
+	if(sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY))<=0.025 )
+    {
+		
+		do{
+			currDP->goalX = X_ROBOT_MIN + ( rand() % (int)( (X_ROBOT_MAX - X_ROBOT_MIN - 0.02)*100.0 ) )/100.0;
+			currDP->goalY = Y_ROBOT_MIN + ( rand() % (int)( (Y_ROBOT_MAX - Y_ROBOT_MIN - 0.02)*100.0 ) )/100.0;
+		}while( (currDP->goalX*currDP->goalX + currDP->goalY*currDP->goalY) > 0.75); //make sure the goal isn't out of reach
+		
+	}
+	return;
+}
+
+
+void goalCheck2(dataPoint *currDP)
+{
+	
+	
+	if(sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY))<=0.025 )
+    {
+		if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+		{
+			int randomNumber = rand()%4;
+			
+			currDP->goalX = goalArrayX[randomNumber];
+			currDP->goalY = goalArrayY[randomNumber];
+		}
+		else
+		{
+			currDP->goalX = centerX;
+			currDP->goalY = centerY;
+		}
+	}
+	return;
+}
+
+
+#endif //PROJECTION3

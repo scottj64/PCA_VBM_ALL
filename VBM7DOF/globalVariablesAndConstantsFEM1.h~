@@ -1,0 +1,79 @@
+#ifndef GLOBAL_VARIABLES_CONSTANTS_H
+#define GLOBAL_VARIABLES_CONSTANTS_H
+
+
+const int NUMBER_OF_IMUS = 5;
+const int IMUoffsetValue = 0;
+const double PI = 3.14159265359;
+
+
+//pretty numbers <=100 for 1,000,000 / x = round number: x= 1, 2, 4, 5, 8, 10, 16, 20, 25, 32, 40, 50, 64, 80, 100
+
+int LOOP_FREQUENCY = 100; //cycles per second
+//no point going faster than 100Hz as that is how fast the Jaco arm controller refreshes
+
+int IMU_FREQUENCY = 100; //cycles per second
+// only need to go about twice as fast as the matlab code is able to refresh which is ~14 Hz and I want it to be a nice number
+
+//int MATLAB_FREQUENCY = 100; //cycles per second
+//no point going faster than 100Hz as that is how fast the Jaco arm controller refreshes
+//Not implemented as Matlab isn't cycling fast enough to matter
+
+bool keepGoing = true; //the loops will check this value
+int  fd_ = 0; // file handle for dongle stream. must be done globally for threading
+
+
+float F1Thresh      = 2.5e4;
+float F1Gain        = 2.5e-6;
+float F2Thresh      = 3e3;
+float F2Gain        = 1.4e-5;
+float F3Thresh      = 0.75e4;
+float F3Gain        = 7e-6;
+float F4Thresh      = 1e3;
+float F4Gain        = 20e-5;
+float F5ThreshOpen  = 2.65e4;
+float F5ThreshClose = 3e4;
+float F5Gain        = 4e-6;
+
+const float centerX = .32;
+const float centerY = .44;
+/*
+const float X_ROBOT_MIN = 0.10;		// Hey! Check these values!!!
+const float X_ROBOT_MAX = 0.50;		// Hey! Check these values!!!
+const float Y_ROBOT_MIN = -0.60;
+const float Y_ROBOT_MAX = -0.04;
+*/const float Z_ROBOT_MIN = 0.05;				
+//const float Z_ROBOT_MAX = 0.72;
+
+
+const float MAX_FINGER_CLOSE  = 6000.0;
+const float MIN_FINGER_OPEN = 0000.0;
+
+
+struct orientation
+{
+	float pitch = 0.0;
+	float yaw   = 0.0;
+	float roll  = 0.0;
+	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+	//int batteryLevel = 100;
+}orient[NUMBER_OF_IMUS]; //must be instantiated globally for threading
+
+struct force
+{
+	float forceX = 0.0;
+	float forceY = 0.0;
+	float forceZ = 0.0;
+	float torqueX = 0.0;
+	float torqueY = 0.0;
+	float torqueZ = 0.0;
+	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+	//int batteryLevel = 100;
+}forces; //must be instantiated globally for threading
+
+
+pthread_mutex_t Matlab_initialized_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t ready_to_loop_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+
+#endif //GLOBAL_VARIABLES_CONSTANTS_H

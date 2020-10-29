@@ -1,0 +1,88 @@
+#ifndef GLOBAL_VARIABLES_CONSTANTS_H
+#define GLOBAL_VARIABLES_CONSTANTS_H
+
+
+const int NUMBER_OF_IMUS = 4;
+int IMUoffsetValue = 0; //0-Mukherjee set, 4 = KIN-Yellow set, 8 = KIN-Blue set
+
+
+const double PI = 3.14159265359;
+
+ int LOOP_FREQUENCY = 100; //cycles per second
+//no point going faster than 100Hz as that is how fast the Jaco arm controller refreshes
+
+ int GRAPHING_FREQUENCY = 25; //cycles per second
+
+//const float FREQUENCY_RATIO = (float)(LOOP_FREQUENCY/GRAPHING_FREQUENCY); //Thishas to be calculated in the 
+
+float goalSizeMult = 1.0;
+
+ float timeRequiredToBeInGoal = 0.50;
+ float newGoalColorCutoffTime = 2.25; //this value is based on how fast the robot can reach each goal. Take the slowest time and multiply it by 1.5.
+
+
+
+bool keepGoing = true; //the loops will check this value
+int fd_ = 0; // file handle for dongle stream. must be done globally for threading
+
+
+//remove the "const" from these to edit them
+const float X_GRAPH_MIN = -0.07;
+const float X_GRAPH_MAX = 1.11;
+const float Y_GRAPH_MIN = 0.20;
+const float Y_GRAPH_MAX = 1.17;
+
+
+const float X_ROBOT_MIN = 0.04;
+const float X_ROBOT_MAX = 0.60;
+const float Y_ROBOT_MIN = 0.16;
+const float Y_ROBOT_MAX = 0.72;
+
+const float INTERCEPT_TR =  1.155980;
+const float INTERCEPT_BR = -0.275980;
+const float INTERCEPT_BL =  0.364020;
+const float INTERCEPT_TL =  0.515980;
+
+const float Y_PLANE_VALUE = -0.44;
+
+
+
+const float END_EFFECTOR_OFFSET_X = 0.04;
+const float END_EFFECTOR_OFFSET_Z = 0.02;
+
+const float centerX = .32;
+const float centerY = .44;
+
+//based on a raidus to goal = 0.22m
+const float goalArrayX[] = {0.47556349186104, 0.54, 0.47556349186104, 0.32, 0.16443650813896, 0.1, 0.16443650813896, 0.32};
+const float goalArrayY[] = {0.59556349186104, 0.44, 0.28443650813896, 0.22, 0.28443650813896, 0.44, 0.59556349186104, 0.66};
+
+
+ float bufferSize = 0.2; //DeadZone. Don't make it zero!
+ float velocityScaleFactor = 10.0; //this is used to scale the velocity....
+
+ float boundaryVelocityBias = 0.01;
+
+float radiusOfGoal = 0.0214; //m, based on Fitz law:  log2(dist to target/radius) = 3.3576
+							 //This is no longer a constant so that it can be edited by command line input
+
+
+int goalNumArray[16];
+//int goalNumIterator = -1;
+int totalNumberOfGoals = 0;
+
+//const bool testingNotPractice = true;
+
+
+struct orientation
+{
+	float pitch = 0;
+	float yaw = 0;
+	float roll = 0;
+	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+	//int batteryLevel = 100;
+}orient[NUMBER_OF_IMUS]; //must be instantiated globally for threading
+
+
+
+#endif //GLOBAL_VARIABLES_CONSTANTS_H

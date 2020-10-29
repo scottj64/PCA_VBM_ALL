@@ -1,0 +1,200 @@
+#ifndef PROJECTION6
+#define PROJECTION6
+
+#include <map>
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include "gnuplot-iostream.h"
+#include <stdlib.h>
+#include <time.h>
+#include <string>
+#include <stdio.h>
+#include <fstream>
+#include <chrono>
+#include <algorithm>
+
+#include <unistd.h>
+#include <sys/time.h>
+
+#include "DataStorage.h"
+
+#include "globalVariablesAndConstants.h"
+
+void initializeGoalOrder(dataPoint *currDP)
+{
+	if (currDP->epochType >10) //testing
+	{
+		totalNumberOfGoals = 24; //3*8=24
+		
+		//create 3 randomized sequences of numbers 1-8 in the array
+		for (int j = 0; j<3; j++)
+		{
+			for(int k = 1; k<9; k++)
+			{
+				goalNumArray[j*8+k-1] = k;
+			}
+			std::random_shuffle(&goalNumArray[j*8],&goalNumArray[(j+1)*8]);
+		}
+	}
+	else //practice
+	{
+		totalNumberOfGoals = 20; //5*4=20
+		//create 5 randomized sequences of numbers [2,4,6,8] in the array
+		for (int j = 0; j<5; j++)
+		{
+			for(int k = 1; k<5; k++)
+			{
+				goalNumArray[j*4+k-1] = k*2;
+			}
+			std::random_shuffle(&goalNumArray[j*4],&goalNumArray[(j+1)*4]);
+		}
+	}
+	
+}
+
+//sets up the graph at the beginning as it crashes if you run this too many times
+void graphSetup( Gnuplot &gp)
+{
+	gp << "set object rectangle from screen 0,0 to screen 1,1 behind fillcolor rgb 'black' fillstyle solid noborder\n";
+	
+	gp << "set xrange [" << X_GRAPH_MIN << ":" << X_GRAPH_MAX << "]\nset yrange [" << Y_GRAPH_MIN << ":" << Y_GRAPH_MAX << "]\n";
+	gp << "set size ratio -1\n" << std::endl; //makes the dimensions square
+	
+	return;
+}
+
+void graph ( Gnuplot &gp, dataPoint *currDP)
+{
+	
+	
+	
+	
+	
+	
+	
+	// All legend stuff
+	gp << "set key left top Left title '";
+	
+	if (currDP->epochType >10) //testing
+	{
+		gp << "Goals left: " << 24 - currDP->goalIterator;
+	}
+	else //practice
+	{
+		gp << "Score: " << currDP->score;
+	}
+		
+	gp << "' tc rgb 'papayawhip' font \",30\"\n"; 
+	
+	
+	
+	//I wish there were a more efficient way of sending these points than recreating the data structure every time
+	std::vector<std::pair<float, float> > goalPoint;
+	goalPoint.push_back(std::make_pair(currDP->goalX, currDP->goalY+VERT_SHIFT));
+	
+	gp << "plot";
+	
+	if (currDP->cursorStatus > 0)
+	{
+		gp << gp.file1d(goalPoint) << " with points pointtype 7 pointsize 4 lc rgb 'yellow' notitle, "; 
+		//filled in circle; need to fiddle with size so it matches real dimension of goal area: see goal check
+	}
+	
+	
+	//if it is less than X seconds since new goal appeared, print outline in green, else print outline in red
+	//this will be dealt with by a boolean set in the goalCheck function
+	
+	gp << gp.file1d(goalPoint) << " with points pointtype 6 pointsize 4 lc rgb '";
+	if (currDP->usingNewGoalColor)
+		gp << "green";
+	else
+		gp << "red";
+		
+	gp << "' lw 2 notitle, "; 
+	//perimeter of circle; see note in previous section
+	
+	
+	
+	
+	//we are no longer plotting the current point
+/*	std::vector<std::pair<float, float> > currentPoint;
+	currentPoint.push_back(std::make_pair(currDP->currentX, currDP->currentY+VERT_SHIFT));
+	gp << gp.file1d(currentPoint) << " with points pointtype 7 pointsize 1 lc rgb 'orange' notitle, ";
+	
+	//looks like we aren't including the arrow
+	std::vector<boost::tuple<double, double, double, double> > directionVector;
+	directionVector.push_back(boost::make_tuple(currDP->currentX, currDP->currentY+VERT_SHIFT, currDP->velocityX/2.0, (currDP->velocityY+VERT_SHIFT)/2.0));
+	gp << "'-' with vectors ls 4 lw 5 lc rgb 'blue' notitle\n";
+	gp.send1d(directionVector);
+*/	
+	gp << std::endl;
+	return;
+}
+
+
+
+
+void goalCheck3(dataPoint *currDP, timeval currentTime)
+{
+	//are we inside goal area?
+	float dist2goal = sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY)); //this is straight distance in meters
+	
+	if(dist2goal <= radiusOfGoal ) //rad = 0.05m; 
+    {
+		if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+		{
+			currDP->cursorStatus = 1; //used for color changes...... is it?
+		}
+		else
+		{
+			currDP->cursorStatus = 2;
+		}
+				
+		if ( ( (currentTime.tv_sec - currDP->goalArrivalTime.tv_sec)*1.0 + (currentTime.tv_usec - currDP->goalArrivalTime.tv_usec)/1000000.0 ) >= timeRequiredToBeInGoal)
+		{
+			//if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+			if (currDP->cursorStatus == 1) //we set the value up there, might as well use it
+			{		
+				currDP->goalIterator++;
+				if ( currDP->goalIterator >= totalNumberOfGoals )
+				{
+					keepGoing = false; //we are all done
+					return;
+				}
+				currDP->goalNum = goalNumArray[currDP->goalIterator];
+				
+				currDP->goalX = goalArrayX[currDP->goalNum-1];
+				currDP->goalY = goalArrayY[currDP->goalNum-1];
+				
+				gettimeofday(&currDP->goalStartTime,NULL); //this is used for changing the color of the goal
+				currDP->usingNewGoalColor = true;
+			}
+			else
+			{
+				currDP->score = (int)(dist2goal*1000/radiusOfGoal); //normalized to radius of goal
+				
+				currDP->goalX = centerX;
+				currDP->goalY = centerY;
+			}
+			
+		}
+		else return;
+	}
+	else
+	{
+		gettimeofday(&currDP->goalArrivalTime,NULL); //you haven't reached it yet
+	}
+	
+	
+	//I'm going to tack on the timer for reaching the goal in a certain amount of time here
+	if ( ( (currentTime.tv_sec - currDP->goalStartTime.tv_sec)*1.0 + (currentTime.tv_usec - currDP->goalStartTime.tv_usec)/1000000.0 ) > newGoalColorCutoffTime ) 
+	{
+		currDP->usingNewGoalColor = false;
+	}
+	
+	return;
+}
+
+#endif //PROJECTION6
+

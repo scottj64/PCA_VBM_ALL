@@ -1,0 +1,17 @@
+http://www.ee.oulu.fi/~sunday/jaco/JacoAPI_ProgrammingGuide.pdf
+2.5 Protection zones p11
+There is a built in protection zone system inside Jaco that can be accessed with the API. A protection zone is specific portion of space that possesses a speed limitation. The first thing to know is that a protection zone’s shape can only be a rectangular prism of type CJacoStructures.ShapeType.PrismSquareBase_Z
+
+There is 2 way of building a protection zone. The first one is to do it manually by instantiating a CZone object and fill its member with values. The other way is to use the static method Czone.CreateXYBaseZone() which takes, as parameters, 4 points to represents the base of the prism, the height of the prism, an angular speed limit and linear speed limit.
+
+
+
+https://www.kinovarobotics.com/sites/default/files/ULWS-RA-JAC-UG-INT-EN%20201804-1.0%20%28KINOVA%E2%84%A2%20Ultra%20lightweight%20robotic%20arm%20user%20guide%29_0.pdf
+Protection zones p55
+Protection zones can be defined using the API (For research users) or with the help of a Kinova qualified service personnel member (for Assistive users). Protection zones must be box-shaped. Once a protection zone is defined, the robot will avoid getting inside this zone. If possible, it will slide on the zone. If not, it will stop. By default, a protection zone is defined near the base connectors.
+
+If you give a command and the robot stops moving because it is too close to a protection zone, try moving the robot in another direction. If you notice that your robot is not moving under any command, your robot’s behaviour is abnormal. Try sending the arm to its Ready position (to continue using it) and contact Kinova support (to report the problem). Protection zones are not avoided during angular control. Only joint limits are handled.
+
+
+https://manualzz.com/doc/7476115/kinova-robotic-arms---jacosoft-user-guide
+No-Go Zone p26 (p20)

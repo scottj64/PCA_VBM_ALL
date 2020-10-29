@@ -1,0 +1,96 @@
+//g++ -std=c++11 -pthread Attempt0_8.cpp -ldl -o Attempt0_8 -lboost_iostreams -lboost_system -lboost_filesystem
+
+//graphing
+#include "gnuplot-iostream.h"
+
+
+#define X_GRAPH_MIN 0.05
+#define X_GRAPH_MAX 0.78
+#define Y_GRAPH_MIN 0.24
+#define Y_GRAPH_MAX 0.78
+
+#define X_ROBOT_MIN 0.08
+#define X_ROBOT_MAX 0.60
+#define Y_ROBOT_MIN 0.20
+#define Y_ROBOT_MAX 0.62
+
+#define VERT_SHIFT 0.04
+
+
+#include "projection5.h"
+// Define the function to be called when ctrl-c (SIGINT) signal is sent to process
+
+#include <unistd.h>
+#include <sys/time.h>
+/*
+void graphSetup( Gnuplot &gp)
+{
+	gp << "set object rectangle from screen 0,0 to screen 1,1 behind fillcolor rgb 'black' fillstyle solid noborder\n";
+	
+	
+	gp << "set xrange [" << X_GRAPH_MIN << ":" << X_GRAPH_MAX << "]\nset yrange [" << Y_GRAPH_MIN << ":" << Y_GRAPH_MAX << "]\n";
+	gp << "set size ratio -1\n" << std::endl;
+	
+	
+	return;
+}
+
+
+
+
+void graph ( Gnuplot &gp)
+{
+	gp << "set key left top Left title '";
+	
+	if (1 >10)
+	{
+		gp << "Goals left: " << 24 -5;
+	}
+	else
+	{
+		gp << "Performance score: " << 5;
+	}
+		
+	gp << "' tc rgb 'papayawhip'\n";
+	
+	
+	gp << "plot";
+	
+	
+	gp << std::endl;
+	
+/*	//looks like we aren't including the arrow
+	std::vector<boost::tuple<double, double, double, double> > directionVector;
+	directionVector.push_back(boost::make_tuple(currDP.currentX, currDP.currentY+VERT_SHIFT, currDP.velocityX/2.0, (currDP.velocityY+VERT_SHIFT)/2.0));
+	gp << "'-' with vectors ls 4 lw 5 notitle" << std:endl;
+	gp.send1d(directionVector);
+*/	
+	return;
+}
+
+*/
+
+
+
+int main(int argc, char * argv[])
+{
+   	
+   	Gnuplot gp;
+   	
+	char c;
+	graphSetup( gp);
+	
+	graph( gp);
+	c = getchar();
+	
+	graph( gp);
+	
+	c = getchar();
+	
+	graph( gp);
+	
+   	gp << "quit" << std::endl;
+
+   	return 0;
+}
+

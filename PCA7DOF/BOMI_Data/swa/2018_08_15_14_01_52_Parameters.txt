@@ -1,0 +1,17 @@
+LOOP_FREQUENCY	100
+F1Gain			0.5
+F2Gain			0.5
+F3Gain			0.5
+F4Gain			10
+F5Gain			10
+F6Gain			10
+F7Gain			10
+CartControlOn	true
+RotControlOn	true
+CartXOn			true
+CartYOn			false
+CartZOn			false
+RotXOn			false
+RotYOn			false
+RotZOn			false
+GrasperOn		false

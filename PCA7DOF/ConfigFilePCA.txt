@@ -1,0 +1,155 @@
+#Parameter file for 7DOF PRogressive Robot Control program
+#anything on a line after a pound symbol will be ignored
+#the format is "key=value" with no spaces
+#These values will be used to change those in globalVariablesAndConstants4.h
+
+#Sample: copy and paste this
+#Name
+#Description 
+#Type = 
+#Default = 
+
+#Key=Value
+
+
+#totalNumPCAVectors
+#The number of PCA vectors (with their variance) that will be returned by the
+#"dance" program. These will be multiplying the returned IMU values to determine
+#the velocities. No point having more than 7.
+#Type =  int
+#Default = 7
+
+#totalNumPCAVectors=7
+
+
+#IMUoffsetValue
+#Value that is used to signify which set of IMUs is being used
+# 0 - Mukherjee's; 4 - KIN Yellow; 8 - KIN Blue
+#Type = integer
+#Default = 0
+
+#IMUoffsetValue= 0
+
+#DEFUNCT
+#velocityScaleFactor
+#Value by which the velocity is scaled before undergoing the bufferTest
+#Type =  float
+#Default = 10.0
+
+#velocityScaleFactor=10.0
+
+
+#bufferSize aka DeadZone
+#Velocities below this value will be set to 0
+#Velocities above this value will have this value subtracted from their
+# magnitude
+#Type =  float
+#Default = 0.2
+
+#bufferSize=0.2
+
+
+#LOOP_FREQUENCY
+#Frequency at which the main loop (read from IMUs and send velocities to robot)
+# runs as well as the sampling rate of the IMUs  
+#Type = integer
+#Default = 100
+
+#LOOP_FREQUENCY=100
+
+
+#F1Gain
+#Value that F1 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F1Gain=10.0
+
+
+#F2Gain
+#Value that F2 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F2Gain=10.0
+
+
+#F3Gain
+#Value that F3 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F3Gain=10.0
+
+
+#F4Gain
+#Value that F4 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F4Gain=10.0
+
+
+#F5Gain
+#Value that F5 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F5Gain=10.0
+
+
+#F6Gain
+#Value that F6 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F6Gain=10.0
+
+
+#F7Gain
+#Value that F7 is multiplied by after calculation
+#Type = float
+#Default = 10.0
+
+#F7Gain=10.0
+
+
+#CartControlOn
+#Allow Cartesian control of end effector
+#Type = bool
+#Default = true
+
+#CartControlOn=true
+
+
+#RotControlOn
+#Allow Rotational control of end effector
+#Type = bool
+#Default = true
+
+#RotControlOn=false
+
+
+# THESE FOLLOWING VALUES SUPERCEDE THE TWO PREVIOUS ONES aka
+# These are set after the previous two if they are implemented
+
+#-left/right+
+#CartXOn=true
+
+#-backward/forward+
+#CartYOn=true
+
+#-down/up+
+#CartZOn=true
+
+#pitch
+#RotXOn=false
+
+#yaw
+#RotYOn=true
+
+#roll
+#RotZOn=false
+
+#is there shoulder control
+#GrasperOn=false

@@ -1,0 +1,157 @@
+#ifndef MATLAB_THREAD_H
+#define MATLAB_THREAD_H
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "/usr/local/MATLAB/R2016b/extern/include/engine.h"
+#include "globalVariablesAndConstants_7DOF_1.h"
+
+
+void *matlabFunction(void*)
+{
+	printf("Matlab locking matlab.\n");
+	pthread_mutex_lock( &Matlab_initialized_mutex );
+	printf("Matlab locked matlab.\n");
+	
+	
+	Engine *ep;
+
+//	printf("MatlabThread\n");
+	/*
+	 * Call engOpen with a NULL string. This starts a MATLAB process 
+     * on the current host using the command "matlab".
+	 */
+	if (!(ep = engOpen(""))) {
+		fprintf(stderr, "\nCan't start MATLAB engine\n");
+		keepGoing = false;
+//		return EXIT_FAILURE;
+	}
+	else
+	{
+//		printf("Start Matlab initialization\n");
+		//We may need to change directory to the Matlab folder with all the matlab scripts
+		//how about this line; the / may or may not be necessary
+		engEvalString(ep, "cd MatlabCode/");
+	
+//		printf("moved folder\n");
+		//Initialization: Pre-compute K^-1
+		engEvalString(ep, "ModelInitialization");
+	
+	
+		double parametersC[] = {F1Thresh, F1Gain, F2Thresh, F2Gain, F3Thresh, F3Gain, F4Thresh, F4Gain, F5Thresh, F5Gain, F6Thresh, F6Gain, F7ThreshClose, F7ThreshOpen, F7Gain};
+		//check if model initialization was successful somehow
+		//then try again or tell everything to hold up a hot second
+		mxArray *parametersM = NULL; //needed?
+		parametersM = mxCreateDoubleMatrix(1, sizeof parametersC / sizeof *parametersC, mxREAL);
+		
+		
+		// send matlab all of the parameters
+		memcpy((void *)mxGetPr(parametersM), (void *)parametersC/*retrieve parameters*/, sizeof parametersC /*define size*/);
+		
+		engPutVariable(ep, "parametersM", parametersM);
+
+		/* 
+		 * Create a variable for the data
+		 * Can this be done in the initialization i.e. outside the loop?
+		 */
+		mxArray *IMUEulerOutput = NULL, *result = NULL;
+		IMUEulerOutput = mxCreateDoubleMatrix(1, NUMBER_OF_IMUS*3, mxREAL);
+		double * PointerToResults;
+		double eulerAngles[NUMBER_OF_IMUS*3];
+
+//		printf("created output\n");	
+		
+		printf("Matlab unlocking matlab.\n");
+		//The program needs to tell the main loop that it is ready to work
+		pthread_mutex_unlock( &Matlab_initialized_mutex );
+		printf("Matlab unlocked matlab.\n");
+		
+		
+		printf("Matlab locking ready.\n");
+		//The program needs to wait for a signal to say that it should start this calculation
+		pthread_mutex_lock( &ready_to_loop_mutex );
+		//thread_mutex_unlock( &ready_to_loop_mutex ); //is there any danger of leaving amutex that isn't going to be referenced again, locked? Memory loss?
+		printf("Matlab locked ready.\n");
+		
+		usleep(250000);
+		
+		while(keepGoing)
+		{
+			for (int i = 0; i < NUMBER_OF_IMUS; i++)
+			{
+				pthread_mutex_lock( &orient[i].mutex );
+				
+				eulerAngles[i*3  ] = orient[i].roll;
+				eulerAngles[i*3+1] = orient[i].yaw;
+				eulerAngles[i*3+2] = orient[i].pitch;
+		
+				pthread_mutex_unlock( &orient[i].mutex );	
+		
+			//	printf("%f\t%f\t%f\n",orient[i].roll,orient[i].yaw,orient[i].pitch);
+			}
+			
+			//eulerAngles[3] = eulerAngles[4] = eulerAngles[5] = 0.0;
+		
+			memcpy((void *)mxGetPr(IMUEulerOutput), (void *)eulerAngles/*retrieve euler angles*/, sizeof(eulerAngles)/*define size*/);
+//			memcpy((void *)currDP., (void *)eulerAngles/*retrieve euler angles*/, sizeof(eulerAngles)/*define size*/);
+		
+//			printf("copied euler angles\n");
+			
+			//Place the variable IMUEulerOutput into the MATLAB workspace
+			engPutVariable(ep, "IMUEulerOutput", IMUEulerOutput);
+
+//			printf("input variable\n");
+			//Run Model
+			engEvalString(ep, "Fest=GetForces(IMUEulerOutput,BIMUnode, NumofBodyIMUs,p,DiffErrorMapping,Fest,parametersM)");
+			
+//			printf("got fest\n");
+
+			result = engGetVariable(ep,"Fest");
+	//		double * PointerToResults = mxGetPr(result);
+			PointerToResults = mxGetPr(result);
+		
+//			printf("got pointerToResults\n");
+			//lock rawVelocity output
+			pthread_mutex_lock( &forces.mutex );
+		
+			//expand this to incorporate additional forces/torques -> velocities, twists
+			forces.P1  = *PointerToResults;// *-1.0;
+			PointerToResults++;
+			forces.P2  = *PointerToResults;
+			PointerToResults++;
+			forces.P3  = *PointerToResults;
+			PointerToResults++;
+			forces.P4 = *PointerToResults *-1.0;
+			PointerToResults++;
+			forces.P5 = *PointerToResults;
+			PointerToResults++;
+			forces.P6 = *PointerToResults;
+			PointerToResults++;
+			forces.P7 = *PointerToResults;
+			
+			//unlock rawVelocity output
+			pthread_mutex_unlock( &forces.mutex );
+			
+			 
+
+//			printf("forceX = %f\tforceY = %f\tforceZ = %f\ttorqueX = %f\ttorqueY = %f\n",forces.forceX,forces.forceY,forces.forceZ,forces.torqueX,forces.torqueX);
+	
+		}
+//		printf("a\n");
+	
+		//We're done! Free memory, close MATLAB engine and exit.
+		 
+		mxDestroyArray(IMUEulerOutput);
+//		printf("b\n");
+		mxDestroyArray(result);
+		mxDestroyArray(parametersM);
+//		printf("c\n");
+		engClose(ep);
+		printf("Matlab Thread Closed\n");
+	}
+	//return EXIT_SUCCESS;
+}
+
+#endif //MATLAB_THREAD_H

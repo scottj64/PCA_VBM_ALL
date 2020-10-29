@@ -1,0 +1,153 @@
+#ifndef DATA_STORAGE_H
+#define DATA_STORAGE_H
+
+#include <vector>
+#include <fstream>
+#include <string>
+#include <unistd.h>
+#include <sys/time.h>
+
+struct dataPoint
+{
+	//output
+	float programTime		= 0.0; //since start of streaming
+	float IMU_values[8]		= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	
+	float currentX			= 0.0;
+	float currentY			= 0.0;
+//	float currentZ			= 0.0;
+	int   goalNum			= 0;
+	int   epochType			= 0;	//whether this is a test or practice and which number it is
+									//1-8:practice; 11:pre-test; 12:mid-test; 13:post-test
+	short cursorStatus		= -1;	//-1: not moving; 0: the cursor is moving; 1: at a center goal; 2: at an outer goal; 
+									//this stuff seriously needs to be fixed
+	//internal
+	bool wasJustOutsideGoal	= false;
+	bool usingNewGoalColor	= true;
+	
+	
+	float velocityX			= 0.0;
+	float velocityY			= 0.0;
+//	float velocityZ			= 0.0;
+	float velocityXraw		= 0.0;
+	float velocityYraw		= 0.0;
+//	float velocityZraw		= 0.0;
+
+
+	//internal
+	struct timeval goalStartTime; //since current goal timer began
+	struct timeval goalArrivalTime; //since cursor arrived in goal area
+	int   goalIterator		= -1;   //the number of goals that have been reached
+	
+	float goalX				= 0.0;
+	float goalY				= 0.0;
+//	float goalZ				= 0.0;
+	
+	int score				= 0.0;
+};
+
+
+
+
+/*
+void addDataPoint(std::vector<dataPoint>& storageVector, dataPoint newDataPoint )
+{
+	storageVector.push_back (newDataPoint);
+}
+*/
+
+
+void printDataHeader(std::ofstream &outputFile)
+{
+	outputFile << "programTime\tIMU1\tIMU2\tIMU3\tIMU4\tIMU5\tIMU6\tIMU7\tIMU8\tcurrentX\tcurrentY\tgoalNum\tepochType\tcursorStatus\tgoalIterator\tvelocityX\tvelocityY\tvelocityXraw\tvelocityYraw\n";
+	return;
+}
+
+
+void printDataPoint(const dataPoint *_DataPoint, std::ofstream &outputFile)
+{
+	outputFile << 
+		_DataPoint->programTime			<< "\t" <<
+		_DataPoint->IMU_values[0]		<< "\t" <<
+		_DataPoint->IMU_values[1]		<< "\t" <<
+		_DataPoint->IMU_values[2]		<< "\t" <<
+		_DataPoint->IMU_values[3]		<< "\t" <<
+		_DataPoint->IMU_values[4]		<< "\t" <<
+		_DataPoint->IMU_values[5]		<< "\t" <<
+		_DataPoint->IMU_values[6]		<< "\t" <<
+		_DataPoint->IMU_values[7]		<< "\t" <<
+		_DataPoint->currentX			<< "\t" <<
+		_DataPoint->currentY			<< "\t" <<
+		_DataPoint->goalNum				<< "\t" <<
+		_DataPoint->epochType			<< "\t" <<
+		_DataPoint->cursorStatus		<< "\t" <<
+		
+		_DataPoint->goalIterator		<< "\t" <<
+		
+//		_DataPoint->goalX				<< "\t" <<
+//		_DataPoint->goalY				<< "\t" <<
+		_DataPoint->velocityX			<< "\t" <<
+		_DataPoint->velocityY			<< "\t" <<
+		_DataPoint->velocityXraw		<< "\t" <<
+		_DataPoint->velocityYraw		<< 
+		
+		std::endl;
+	return;
+}
+
+
+
+/*
+void printData(const std::vector<dataPoint>& storageVector, std::ofstream &outputFile)
+{
+	outputFile << "programTime\tIMU1\tIMU2\tIMU3\tIMU4\tIMU5\tIMU6\tIMU7\tIMU8\tcurrentX\tcurrentY\tgoalNum\tepochType\tcursorStatus\tgoalIterator\tvelocityX\tvelocityY\tvelocityXraw\tvelocityYraw\n";
+	
+	//for (std::vector<dataPoint>::const_iterator i = storageVector.begin(); i != storageVector.end(); ++i)
+	for (int i = 0; i!=storageVector.size(); i++)
+	{
+		outputFile << 
+		storageVector.at(i).programTime			<< "\t" <<
+		storageVector.at(i).IMU_values[0]		<< "\t" <<
+		storageVector.at(i).IMU_values[1]		<< "\t" <<
+		storageVector.at(i).IMU_values[2]		<< "\t" <<
+		storageVector.at(i).IMU_values[3]		<< "\t" <<
+		storageVector.at(i).IMU_values[4]		<< "\t" <<
+		storageVector.at(i).IMU_values[5]		<< "\t" <<
+		storageVector.at(i).IMU_values[6]		<< "\t" <<
+		storageVector.at(i).IMU_values[7]		<< "\t" <<
+		storageVector.at(i).currentX			<< "\t" <<
+		storageVector.at(i).currentY			<< "\t" <<
+		storageVector.at(i).goalNum				<< "\t" <<
+		storageVector.at(i).epochType			<< "\t" <<
+		storageVector.at(i).cursorStatus		<< "\t" <<
+		
+		storageVector.at(i).goalIterator		<< "\t" <<
+		
+//		storageVector.at(i).goalX				<< "\t" <<
+//		storageVector.at(i).goalY				<< "\t" <<
+		storageVector.at(i).velocityX			<< "\t" <<
+		storageVector.at(i).velocityY			<< "\t" <<
+		storageVector.at(i).velocityXraw		<< "\t" <<
+		storageVector.at(i).velocityYraw		<< 
+		
+		"\n";
+	}
+	outputFile << std::endl;
+}
+*/
+
+/*
+void printData2(const std::vector<dataPoint>& storageVector, std::ofstream &outputFile)
+{
+	printDataHeader(outputFile);
+	
+	//for (std::vector<dataPoint>::const_iterator i = storageVector.begin(); i != storageVector.end(); ++i)
+	for (int i = 0; i!=storageVector.size(); i++)
+	{
+		printDataPoint(&storageVector.at(i), outputFile);
+	}
+	return;
+}
+*/
+
+#endif //DATA_STORAGE_H

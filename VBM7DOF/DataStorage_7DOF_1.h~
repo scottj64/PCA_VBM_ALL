@@ -1,0 +1,109 @@
+#ifndef DATA_STORAGE_H
+#define DATA_STORAGE_H
+
+#include <vector>
+#include <fstream>
+#include <string>
+#include <unistd.h>
+#include <sys/time.h>
+
+struct dataPoint
+{
+	//output
+	float programTime		= 0.0; //since start of streaming
+	float IMU_values[15]	= {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	
+	float currentXloc		= 0.0;
+	float currentYloc		= 0.0;
+	float currentZloc		= 0.0;
+	float currentXrot		= 0.0; //thetaX
+	float currentYrot		= 0.0; //thetaY
+	float currentZrot		= 0.0; //thetaZ
+	
+	short int finger1val	= 0;
+	short int finger2val	= 0;
+	short int finger3val	= 0;
+	short int fingersval	= 0;
+	
+	float velocityXraw		= 0.0;
+	float velocityYraw		= 0.0;
+	float velocityZraw		= 0.0;
+	
+	float yaw_raw			= 0.0;
+	float pitch_raw			= 0.0;
+	float roll_raw			= 0.0;
+	
+	float thetaX			= 0.0;
+	float thetaY			= 0.0;
+	float thetaZ			= 0.0;
+	
+	float grasp				= 0.0;
+	float graspraw			= 0.0;
+	
+	short int fingersTold	= 0.0;
+//	float finger1told		= 0.0;
+//	float finger2told		= 0.0;
+//	float finger3told		= 0.0;
+	
+};
+
+
+
+
+void printDataPoint(const dataPoint *_DataPoint, std::ofstream &outputFile)
+{
+	outputFile << 
+		_DataPoint->programTime			<< "\t" <<
+		_DataPoint->IMU_values[0]		<< "\t" <<
+		_DataPoint->IMU_values[1]		<< "\t" <<
+		_DataPoint->IMU_values[2]		<< "\t" <<
+		_DataPoint->IMU_values[3]		<< "\t" <<
+		_DataPoint->IMU_values[4]		<< "\t" <<
+		_DataPoint->IMU_values[5]		<< "\t" <<
+		_DataPoint->IMU_values[6]		<< "\t" <<
+		_DataPoint->IMU_values[7]		<< "\t" <<
+		_DataPoint->IMU_values[8]		<< "\t" <<
+		_DataPoint->IMU_values[9]		<< "\t" <<
+		_DataPoint->IMU_values[10]		<< "\t" <<
+		_DataPoint->IMU_values[11]		<< "\t" <<
+		_DataPoint->IMU_values[12]		<< "\t" <<
+		_DataPoint->IMU_values[13]		<< "\t" <<
+		_DataPoint->IMU_values[14]		<< "\t" <<
+
+		_DataPoint->currentXloc			<< "\t" <<
+		_DataPoint->currentYloc			<< "\t" <<
+		_DataPoint->currentZloc			<< "\t" <<
+		_DataPoint->currentXrot			<< "\t" <<
+		_DataPoint->currentYrot			<< "\t" <<
+		_DataPoint->currentZrot			<< "\t" <<
+		_DataPoint->fingersval			<< "\t" <<
+//		_DataPoint->finger1val			<< "\t" <<
+//		_DataPoint->finger2val			<< "\t" <<
+//		_DataPoint->finger3val			<< "\t" <<
+
+	
+//		_DataPoint->velocityX			<< "\t" <<
+//		_DataPoint->velocityY			<< "\t" <<
+//		_DataPoint->velocityZ			<< "\t" <<
+		_DataPoint->velocityXraw		<< "\t" <<
+		_DataPoint->velocityYraw		<< "\t" <<
+		_DataPoint->velocityZraw		<< "\t" <<
+	
+//		_DataPoint->twistX				<< "\t" <<
+//		_DataPoint->twistY				<< "\t" <<
+//		_DataPoint->twistZ				<< "\t" <<
+		_DataPoint->twistXraw			<< "\t" <<
+		_DataPoint->twistYraw			<< "\t" <<
+		_DataPoint->twistZraw			<< "\t" <<
+	
+
+		_DataPoint->fingersTold			<< "\t" <<
+	//	_DataPoint->finger1told			<< "\t" <<
+	//	_DataPoint->finger2told			<< "\t" <<
+	//	_DataPoint->finger3told			<< "\t" <<
+		
+		std::endl;
+	return;
+}
+
+#endif //DATA_STORAGE_H

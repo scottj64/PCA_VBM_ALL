@@ -1,0 +1,103 @@
+#Parameter file for Attempt program
+#anything on a line after a pound symbol will be ignored
+#the format is "key=value" with no spaces
+#These values will be used to change those in globalVariablesAndConstants3.h
+
+#IMUoffsetValue
+#Value that is used to signify which set of IMUs is being used
+# 0 - Mukherjee's; 4 - KIN Yellow; 8 - KIN Blue
+#Type = integer
+#Default = 0
+
+#IMUoffsetValue= 0
+
+
+#velocityScaleFactor
+#Value by which the velocity is scaled before undergoing the bufferTest
+#Type =  float
+#Default = 10.0
+
+velocityScaleFactor=5.0
+
+
+#bufferSize aka DeadZone
+#Velocities below this value will be set to 0
+#Velocities above this value will have this value subtracted from their
+# magnitude
+#Type =  float
+#Default = 0.2
+
+#bufferSize=0.2
+
+
+#boundaryVelocityBias
+#Value that is added to velocity normal to the direction of a boundary in order
+# to move the robot back into the field of use
+#Type =  float
+#Default = 0.01
+
+#boundaryVelocityBias=0.01
+
+
+#LOOP_FREQUENCY
+#Frequency at which the main loop (read from IMUs and send velocities to robot)
+# runs as well as the sampling rate of the IMUs  
+#Type = integer
+#Default = 100
+
+#LOOP_FREQUENCY=100
+
+
+#GRAPHING_FREQUENCY
+#Frequency at which the graph refeshes 
+#Type = integer
+#Default = 25
+
+#GRAPHING_FREQUENCY=25
+
+
+#newGoalColorCutoffTime
+#The time that the new outer goal will retain its new goal color and the time
+# that the larger goal location signifier will remain 
+#Type =  float
+#Default = 2.25
+
+#newGoalColorCutoffTime=2.25
+
+
+#goalSizeMult
+#Value by which the radius of the goal is multiplied
+#Type =  float
+#Default = 1.0
+
+goalSizeMult=1.25
+
+
+#timeRequiredToBeInGoal
+#The time that the cursor has to be in the goal region for it to count as a 
+# successful reach 
+#Type =  float
+#Default = 0.5
+
+#timeRequiredToBeInGoal=0.5
+
+
+
+#END_EFFECTOR_OFFSET_X
+#offset for mapping cursor position to robot hand position in X direction
+#Type =  float
+#Default = 0.04
+
+END_EFFECTOR_OFFSET_X=0.01
+
+
+#END_EFFECTOR_OFFSET_Z
+#offset for mapping cursor position to robot hand position in Z (aka Y) direction
+#Type =  float
+#Default = 0.06
+
+END_EFFECTOR_OFFSET_Z=0.05
+
+
+
+

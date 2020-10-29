@@ -1,0 +1,228 @@
+#ifndef PROJECTION4
+#define PROJECTION4
+
+#include <map>
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include "gnuplot-iostream.h"
+#include <stdlib.h>
+#include <time.h>
+#include <string>
+#include <stdio.h>
+#include <fstream>
+#include <chrono>
+#include <algorithm>
+
+#include <unistd.h>
+#include <sys/time.h>
+
+#include "DataStorage.h"
+
+#include "globalVariablesAndConstants.h"
+
+//these values get to be played with as the graphs resizes according to its limits
+/*
+#define X_GRAPH_MIN 0.05
+#define X_GRAPH_MAX 0.78
+#define Y_GRAPH_MIN 0.24
+#define Y_GRAPH_MAX 0.78
+
+#define X_ROBOT_MIN 0.08
+#define X_ROBOT_MAX 0.60
+#define Y_ROBOT_MIN 0.20
+#define Y_ROBOT_MAX 0.62
+
+#define VERT_SHIFT 0.04
+
+
+const float goalArrayX[] = {0.54142135623731, 0.6, 0.54142135623731, 0.4, 0.258578643762691, 0.2, 0.25857864376269, 0.4};
+const float goalArrayY[] = {0.54142135623731, 0.4, 0.258578643762691, 0.2, 0.25857864376269, 0.4, 0.54142135623731, 0.6};
+const float centerX = .4;
+const float centerY = .4;
+
+
+int goalNumArray[24];
+//int goalNumIterator = -1;
+int totalNumberOfGoals = 0;
+
+#define testingNotPractice true
+
+*/
+
+void initializeGoalOrder()
+{
+	if (testingNotPractice)
+	{
+		totalNumberOfGoals = 24; //3*8=24
+		for (int j = 0; j<3; j++)
+		{
+			for(int k = 1; k<9; k++)
+			{
+				goalNumArray[j*8+k-1] = k;
+			}
+			std::random_shuffle(&goalNumArray[j*8],&goalNumArray[(j+1)*8]);
+		}
+	}
+	else
+	{
+		totalNumberOfGoals = 20; //5*4=20
+		for (int j = 0; j<5; j++)
+		{
+			for(int k = 1; k<5; k++)
+			{
+				goalNumArray[j*4+k-1] = k;
+			}
+			std::random_shuffle(&goalNumArray[j*4],&goalNumArray[(j+1)*4]);
+		}
+	}
+	
+}
+
+
+
+
+
+void graph ( Gnuplot &gp, dataPoint *currDP)
+{
+	std::vector<std::pair<float, float> > goalPoint;
+	goalPoint.push_back(std::make_pair(currDP->goalX, currDP->goalY+VERT_SHIFT));
+	
+	std::vector<std::pair<float, float> > currentPoint;
+	currentPoint.push_back(std::make_pair(currDP->currentX, currDP->currentY+VERT_SHIFT));
+	
+	gp << "set object rectangle from screen 0,0 to screen 1,1 behind fillcolor rgb 'black' fillstyle solid noborder\n";
+	
+	
+	gp << "set xrange [" << X_GRAPH_MIN << ":" << X_GRAPH_MAX << "]\nset yrange [" << Y_GRAPH_MIN << ":" << Y_GRAPH_MAX << "]\n";
+	gp << "set size ratio -1\n";
+	
+	
+	gp << "set key left top Left title '";
+	
+	if (currDP->epochType >10)
+	{
+		gp << "Goals left: " << 24 -currDP->goalIterator;
+	}
+	else
+	{
+		gp << "Performance score: Good job!";
+	}
+		
+	gp << "' tc rgb 'papayawhip'\n";
+	
+	
+	gp << "plot";
+	
+	if (currDP->cursorStatus > 0)
+	{
+		gp << gp.file1d(goalPoint) << " with points pointtype 7 pointsize 17 lc rgb 'yellow' notitle, ";
+	}
+	
+	gp << gp.file1d(goalPoint) << " with points pointtype 6 pointsize 17 lc rgb 'red' lw 4 notitle, ";
+	
+	gp << gp.file1d(currentPoint) << " with points pointtype 7 pointsize 2 lc rgb 'white' notitle, ";
+	
+	gp << std::endl;
+	
+/*	//looks like we aren't including the arrow
+	std::vector<boost::tuple<double, double, double, double> > directionVector;
+	directionVector.push_back(boost::make_tuple(currDP.currentX, currDP.currentY+VERT_SHIFT, currDP.velocityX/2.0, (currDP.velocityY+VERT_SHIFT)/2.0));
+	gp << "'-' with vectors ls 4 lw 5 notitle" << std:endl;
+	gp.send1d(directionVector);
+*/	
+	return;
+}
+
+
+
+
+void goalCheck3(dataPoint *currDP, timeval currentTime)
+{
+	if(sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY))<=0.025 )
+    {
+		if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+		{
+			currDP->cursorStatus = 1; //used for color changes
+		}
+		else
+		{
+			currDP->cursorStatus = 2;
+		}
+				
+		if ( ( (currentTime.tv_sec - currDP->goalArrivalTime.tv_sec)*1.0 + (currentTime.tv_usec - currDP->goalArrivalTime.tv_usec)/1000000.0 ) > 0.5)
+		{
+			if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+			{		
+				currDP->goalIterator++;
+				if ( currDP->goalIterator >= totalNumberOfGoals )
+				{
+					keepGoing = false; //we are all done
+					return;
+				}
+				currDP->goalNum = goalNumArray[currDP->goalIterator];
+				currDP->goalX = goalArrayX[goalNumArray[currDP->goalIterator]-1];
+				currDP->goalY = goalArrayY[goalNumArray[currDP->goalIterator]-1];
+			}
+			else
+			{
+				currDP->goalX = centerX;
+				currDP->goalY = centerY;
+			}
+			//This is when we would calculate a score based on the time it took to get to the goal and final location of cursor
+			//Then reset the applicable timer
+			//or do these steps only apply to reaching an outer goal
+		}
+		else return;
+	}
+	else
+	{
+		gettimeofday(&currDP->goalArrivalTime,NULL);
+	}
+	return;
+}
+/*
+
+
+
+
+
+
+
+void goalCheck2(dataPoint *currDP)
+{
+	if(sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY))<=0.025 )
+    {
+		if ((currDP->goalX == centerX) && (currDP->goalY == centerY))
+		{
+			int randomNumber = rand()%4;
+			
+			currDP->goalX = goalArrayX[randomNumber];
+			currDP->goalY = goalArrayY[randomNumber];
+		}
+		else
+		{
+			currDP->goalX = centerX;
+			currDP->goalY = centerY;
+		}
+	}
+	return;
+}
+
+void goalCheck(dataPoint *currDP)
+{
+	if(sqrt((currDP->currentX-currDP->goalX)*(currDP->currentX-currDP->goalX) + (currDP->currentY-currDP->goalY)*(currDP->currentY-currDP->goalY))<=0.025 )
+    {
+		
+		do{
+			currDP->goalX = X_ROBOT_MIN + ( rand() % (int)( (X_ROBOT_MAX - X_ROBOT_MIN - 0.02)*100.0 ) )/100.0;
+			currDP->goalY = Y_ROBOT_MIN + ( rand() % (int)( (Y_ROBOT_MAX - Y_ROBOT_MIN - 0.02)*100.0 ) )/100.0;
+		}while( (currDP->goalX*currDP->goalX + currDP->goalY*currDP->goalY) > 0.75); //make sure the goal isn't out of reach
+		
+	}
+	return;
+}
+*/
+
+#endif //PROJECTION4
+
